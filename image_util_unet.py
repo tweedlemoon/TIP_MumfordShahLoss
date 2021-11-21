@@ -1,13 +1,9 @@
 from __future__ import print_function, division, absolute_import, unicode_literals
 
-#import cv2
-import glob
+# import cv2
 import numpy as np
-import ipdb
-import matplotlib.pyplot as plt
-import torchvision.transforms as transforms
-import scipy.misc
 import torch
+
 
 class BaseDataProvider(object):
 
