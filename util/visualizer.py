@@ -1,12 +1,11 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import os
-import ntpath
 import time
-import ipdb
-from . import util
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 from . import html
-import scipy.ndimage as ndimage
+from . import util
 
 
 class Visualizer():
@@ -59,7 +58,7 @@ class Visualizer():
                     if idx % ncols == 0:
                         label_html += '<tr>%s</tr>' % label_html_row
                         label_html_row = ''
-                white_image = np.ones_like(image_numpy.transpose([2, 0, 1]))*255
+                white_image = np.ones_like(image_numpy.transpose([2, 0, 1])) * 255
                 while idx % ncols != 0:
                     images.append(white_image)
                     label_html_row += '<td></td>'
@@ -115,7 +114,6 @@ class Visualizer():
                 'xlabel': 'epoch',
                 'ylabel': 'loss'},
             win=self.display_id)
-
 
     # errors: same format as |errors| of plotCurrentErrors
     def print_current_errors(self, epoch, i, iters, errors, t, mode):
@@ -173,7 +171,6 @@ class Visualizer():
             txts.append(label)
             links.append(image_name)
 
-
         image_name = '%s_%s.png' % (name, 'pred_gt')
         save_path = os.path.join(image_dir, image_name)
         img = pred_gt.astype(float)
@@ -200,8 +197,8 @@ class Visualizer():
         plt.axis('off')
         plt.savefig(save_path)
         plt.close()
-        
-    def calculate_score(self, label, pred,  score):
+
+    def calculate_score(self, label, pred, score):
         if score == "dice":
             intersect = float(np.sum(pred.astype(int) * label.astype(int)))
             union = float(np.sum(pred.astype(int)) + np.sum(label.astype(int)))
@@ -222,7 +219,7 @@ class Visualizer():
             FN = float(np.sum((~pred).astype(int) * (label).astype(int)))
             if TP + FN == 0:
                 return 0
-            return TP/(TP+FN)
+            return TP / (TP + FN)
 
         elif score == "ppv":
             TP = float(np.sum(pred.astype(int) * label.astype(int)))
@@ -231,9 +228,3 @@ class Visualizer():
                 return 0
 
             return TP / (TP + FP)
-
-
-
-
-
-

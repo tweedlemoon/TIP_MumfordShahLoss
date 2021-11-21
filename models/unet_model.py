@@ -1,16 +1,11 @@
-import numpy as np
-import torch
-import os
 from collections import OrderedDict
+
 from torch.autograd import Variable
-import itertools
+
 import util.util as util
-from .base_model import BaseModel
 from . import networks_unet
+from .base_model import BaseModel
 from .loss import *
-from . import loss
-import sys
-import ipdb
 
 
 class UNetModel(BaseModel):

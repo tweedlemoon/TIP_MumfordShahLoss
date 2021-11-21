@@ -9,17 +9,16 @@ from math import *
 from util import html
 import ipdb
 
-
 opt = TrainOptions().parse()
 
-input_min       = 0
-input_max       = 400
+input_min = 0
+input_max = 400
 
 data_train = DataProvider_LiTS(opt.inputSize, opt.fineSize, opt.segType, opt.semi_rate, opt.input_nc,
                                opt.dataroot, a_min=input_min, a_max=input_max, mode="train")
 dataset_size = data_train.n_data
 print('#training images = %d' % dataset_size)
-training_iters = int(ceil(data_train.n_data/float(opt.batchSize)))
+training_iters = int(ceil(data_train.n_data / float(opt.batchSize)))
 
 total_steps = 0
 model = create_model(opt)
@@ -29,7 +28,7 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
     epoch_start_time = time.time()
 
     """ Train """
-    for step in range(1, training_iters+1):
+    for step in range(1, training_iters + 1):
         batch_x, batch_y, path = data_train(opt.batchSize)
         data = {'A': batch_x, 'B': batch_y,
                 'A_paths': path, 'B_paths': path}

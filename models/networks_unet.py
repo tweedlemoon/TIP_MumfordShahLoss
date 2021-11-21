@@ -165,11 +165,12 @@ class SubpixelUnetGenerator(nn.Module):
         else:
             return self.model(input)
 
+
 class subpixelPool(nn.Module):
     def __init__(self, input_nc):
         super(subpixelPool, self).__init__()
         self.input_nc = input_nc
-        self.output_nc = input_nc*4
+        self.output_nc = input_nc * 4
 
     def forward(self, input):
         output1 = input[:, :, ::2, ::2]
@@ -178,19 +179,22 @@ class subpixelPool(nn.Module):
         output4 = input[:, :, 1::2, 1::2]
         return torch.cat([output1, output2, output3, output4], dim=1)
 
+
 class unSubpixelPool(nn.Module):
     def __init__(self, input_nc):
         super(unSubpixelPool, self).__init__()
         self.input_nc = input_nc
-        self.output_nc = int(input_nc/4)
+        self.output_nc = int(input_nc / 4)
 
     def forward(self, input):
-        output = Variable(torch.cuda.FloatTensor(input.shape[0], self.output_nc, input.shape[2]*2, input.shape[3]*2).zero_())
-        output[:, :, ::2, ::2] = input[:, :int(self.input_nc/4), :, :]
-        output[:, :, ::2, 1::2] = input[:, int(self.input_nc/4):int(self.input_nc/2), :, :]
-        output[:, :, 1::2, ::2] = input[:, int(self.input_nc/2):int(self.input_nc*3/4), :, :]
-        output[:, :, 1::2, 1::2] = input[:, int(self.input_nc*3/4):, :, :]
+        output = Variable(
+            torch.cuda.FloatTensor(input.shape[0], self.output_nc, input.shape[2] * 2, input.shape[3] * 2).zero_())
+        output[:, :, ::2, ::2] = input[:, :int(self.input_nc / 4), :, :]
+        output[:, :, ::2, 1::2] = input[:, int(self.input_nc / 4):int(self.input_nc / 2), :, :]
+        output[:, :, 1::2, ::2] = input[:, int(self.input_nc / 2):int(self.input_nc * 3 / 4), :, :]
+        output[:, :, 1::2, 1::2] = input[:, int(self.input_nc * 3 / 4):, :, :]
         return output
+
 
 class SubpixelUnetSkipConnectionBlock(nn.Module):
     def __init__(self, outer_nc, inner_nc, input_nc=None,
@@ -209,13 +213,13 @@ class SubpixelUnetSkipConnectionBlock(nn.Module):
         if outermost:
             C1 = nn.Conv2d(input_nc, inner_nc, kernel_size=3, stride=1, padding=1, bias=False)
         else:
-            C1 = nn.Conv2d(inner_nc*2, inner_nc, kernel_size=3, stride=1, padding=1, bias=False)
+            C1 = nn.Conv2d(inner_nc * 2, inner_nc, kernel_size=3, stride=1, padding=1, bias=False)
         B1 = norm_layer(inner_nc)
         R1 = nn.ReLU(True)
         # R1 = nn.LeakyReLU(0.2, True)
         if innermost:
-            C2 = nn.Conv2d(inner_nc, inner_nc*2, kernel_size=3, stride=1, padding=1, bias=False)
-            B2 = norm_layer(inner_nc*2)
+            C2 = nn.Conv2d(inner_nc, inner_nc * 2, kernel_size=3, stride=1, padding=1, bias=False)
+            B2 = norm_layer(inner_nc * 2)
         else:
             C2 = nn.Conv2d(inner_nc, inner_nc, kernel_size=3, stride=1, padding=1, bias=False)
             B2 = norm_layer(inner_nc)
@@ -229,8 +233,8 @@ class SubpixelUnetSkipConnectionBlock(nn.Module):
             C2u = nn.Conv2d(inner_nc, inner_nc, kernel_size=3, stride=1, padding=1, bias=False)
             B2u = norm_layer(inner_nc)
         else:
-            C2u = nn.Conv2d(inner_nc, inner_nc*2, kernel_size=3, stride=1, padding=1, bias=False)
-            B2u = norm_layer(inner_nc*2)
+            C2u = nn.Conv2d(inner_nc, inner_nc * 2, kernel_size=3, stride=1, padding=1, bias=False)
+            B2u = norm_layer(inner_nc * 2)
         R2u = nn.ReLU(True)
         CBR1CBR2u = [C1u, B1u, R1u, C2u, B2u, R2u]
 
@@ -241,12 +245,12 @@ class SubpixelUnetSkipConnectionBlock(nn.Module):
             up = CBR1CBR2u + [Cend] + [nn.Softmax2d()]
             model = down + [submodule] + up
         elif innermost:
-            upconv = unSubpixelPool(inner_nc*2)
+            upconv = unSubpixelPool(inner_nc * 2)
             down = [downconv] + CBR1CBR2
             up = [upconv]
             model = down + up
         else:
-            upconv = unSubpixelPool(inner_nc*2)
+            upconv = unSubpixelPool(inner_nc * 2)
             down = [downconv] + CBR1CBR2
             up = CBR1CBR2u + [upconv]
 
@@ -262,6 +266,7 @@ class SubpixelUnetSkipConnectionBlock(nn.Module):
             return self.model(x)
         else:
             return torch.cat([x, self.model(x)], 1)
+
 
 ########################################################################################################################
 # U-Net
